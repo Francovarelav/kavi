@@ -1,0 +1,21 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow authenticated users to read/write only files under 'rules/**'
+    match /rules/{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Allow authenticated users to read/write only files under 'cars/**'
+    match /cars/{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Everything else is denied by default
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+

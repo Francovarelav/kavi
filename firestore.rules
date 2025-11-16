@@ -1,0 +1,59 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && getUserRole() == 'admin';
+    }
+
+    // users: solo documentos de administradores
+    match /users/{userId} {
+      // Crear su propio documento en registro
+      allow create: if isSignedIn() && request.auth.uid == userId;
+
+      // Lectura/actualización/eliminación solo por admin
+      allow read, update, delete: if isAdmin();
+    }
+
+    // cars: inventario de autos (solo admin)
+    match /cars/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // rules: reglas de IA (solo admin)
+    match /rules/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // documents: documentos de conocimiento (solo admin)
+    match /documents/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // sessions: sesiones del agente (solo admin, por ahora)
+    match /sessions/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // suggestions: sugerencias generadas por el agente (solo admin)
+    match /suggestions/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Denegar todo lo demás por defecto
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
