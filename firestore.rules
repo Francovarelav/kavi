@@ -25,9 +25,10 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
-    // cars: inventario de autos (solo admin)
+  // cars: inventario de autos (lectura pública para recomendaciones, escritura solo admin)
     match /cars/{docId} {
-      allow read, write: if isAdmin();
+    allow read: if true; // Permitir lectura pública para que Kavi pueda recomendar
+    allow write: if isAdmin();
     }
 
     // rules: reglas de IA (solo admin)
@@ -40,13 +41,23 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
-    // sessions: sesiones del agente (solo admin, por ahora)
+    // sessions: sesiones del agente
     match /sessions/{docId} {
-      allow read, write: if isAdmin();
+      // Permitir crear sesiones sin autenticación (para usuarios anónimos)
+      allow create: if true;
+      // Permitir actualizar durante la conversación
+      allow update: if true;
+      // Solo admin puede leer y eliminar
+      allow read, delete: if isAdmin();
     }
 
     // suggestions: sugerencias generadas por el agente (solo admin)
     match /suggestions/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // dataCalls: insights generados por Gemini (solo admin)
+    match /dataCalls/{docId} {
       allow read, write: if isAdmin();
     }
 

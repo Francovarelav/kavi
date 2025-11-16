@@ -41,18 +41,10 @@ export default function AdminSignup() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background" style={{ height: '100vh', overflow: 'hidden' }}>
+    <div className="flex flex-col lg:flex-row min-h-screen bg-background">
       {/* Form Section */}
-      <div 
-        className="flex items-center justify-center" 
-        style={{ 
-          width: '50%', 
-          height: '100vh', 
-          overflowY: 'auto',
-          padding: '2rem'
-        }}
-      >
-          <div className="w-full max-w-md">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 lg:p-12 overflow-y-auto min-h-screen">
+        <div className="w-full max-w-md py-8">
             <form className={cn("flex flex-col gap-6")} onSubmit={handleSubmit}>
               <FieldGroup>
                 <div className="flex flex-col items-center gap-1 text-center">
@@ -110,7 +102,7 @@ export default function AdminSignup() {
                 </Field>
                 
                 <Field>
-                  <Button type="submit" disabled={loading}>
+                <Button type="submit" disabled={loading} className="w-full">
                     {loading ? "Creando Cuenta..." : "Crear Cuenta de Administrador"}
                   </Button>
                 </Field>
@@ -126,15 +118,11 @@ export default function AdminSignup() {
           </div>
       </div>
 
-      {/* Image Section */}
+      {/* Image Section - Hidden on mobile */}
       <div 
+        className="hidden lg:block lg:w-1/2 h-64 lg:h-screen bg-cover bg-center"
         style={{
-          width: '50%',
-          height: '100vh',
           backgroundImage: `url(${signupImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
         }}
       />
     </div>

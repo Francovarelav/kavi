@@ -47,6 +47,7 @@ type Car = {
   aisle: number | null;
   photoUrls: string[];
   createdAt: string;
+  price?: number;
 };
 
 export default function AdminCars() {
@@ -307,6 +308,36 @@ export default function AdminCars() {
     }
   };
 
+  const assignRandomPricesToAll = async () => {
+    if (!cars.length) return;
+    setAssigningAisles(true); // Reusar el estado
+    setMessage("");
+    setError("");
+    try {
+      const batch = writeBatch(db);
+      for (const c of cars) {
+        // Generar precio basado en el año y kilometraje
+        const basePrice = 150000; // Precio base
+        const yearFactor = c.year ? (c.year - 2000) * 10000 : 0; // Más nuevo = más caro
+        const mileageFactor = c.mileage ? -Math.floor(c.mileage / 10000) * 5000 : 0; // Más km = más barato
+        const randomVariation = Math.floor(Math.random() * 50000) - 25000; // +/- 25k variación
+        
+        const calculatedPrice = Math.max(80000, basePrice + yearFactor + mileageFactor + randomVariation);
+        const roundedPrice = Math.round(calculatedPrice / 1000) * 1000; // Redondear a miles
+        
+        const carRef = doc(db, "cars", c.id);
+        batch.update(carRef, { price: roundedPrice });
+      }
+      await batch.commit();
+      setMessage("✅ Precios asignados aleatoriamente a todos los autos");
+      await fetchCars();
+    } catch (e: any) {
+      setError(e?.message || "Error al asignar precios");
+    } finally {
+      setAssigningAisles(false);
+    }
+  };
+
   // Unique values for filters
   const uniqueMarcas = useMemo(() => [...new Set(cars.map(c => c.make).filter(Boolean))], [cars]);
   const uniqueModelos = useMemo(() => [...new Set(cars.map(c => c.model).filter(Boolean))], [cars]);
@@ -427,7 +458,10 @@ export default function AdminCars() {
                     </Button>
                   </label>
                   <Button variant="secondary" className="text-blue-700" onClick={assignRandomAislesToAll} disabled={assigningAisles || !cars.length}>
-                    {assigningAisles ? "Asignando pasillos..." : "Asignar pasillos 1–5"}
+                    {assigningAisles ? "Asignando..." : "Asignar pasillos 1–5"}
+                  </Button>
+                  <Button variant="secondary" className="text-green-700" onClick={assignRandomPricesToAll} disabled={assigningAisles || !cars.length}>
+                    {assigningAisles ? "Asignando..." : "💰 Asignar precios"}
                   </Button>
                 </div>
               </div>
@@ -631,16 +665,16 @@ export default function AdminCars() {
                     >
                       {assigningAisles ? "Asignando pasillos..." : "Asignar pasillos 1–5"}
                     </Button>
-                    <ToggleGroup type="single" value={viewMode} onValueChange={(v) => v && setViewMode(v as any)} className="border">
-                      <ToggleGroupItem value="cards" aria-label="Vista en tarjetas" className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
-                        <IconLayoutGrid className="h-4 w-4 mr-2" />
-                        Cards
-                      </ToggleGroupItem>
-                      <ToggleGroupItem value="list" aria-label="Vista en lista" className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
-                        <IconList className="h-4 w-4 mr-2" />
-                        Lista
-                      </ToggleGroupItem>
-                    </ToggleGroup>
+                  <ToggleGroup type="single" value={viewMode} onValueChange={(v) => v && setViewMode(v as any)} className="border">
+                    <ToggleGroupItem value="cards" aria-label="Vista en tarjetas" className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
+                      <IconLayoutGrid className="h-4 w-4 mr-2" />
+                      Cards
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="list" aria-label="Vista en lista" className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
+                      <IconList className="h-4 w-4 mr-2" />
+                      Lista
+                    </ToggleGroupItem>
+                  </ToggleGroup>
                   </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">

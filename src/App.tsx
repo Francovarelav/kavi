@@ -6,6 +6,8 @@ import AdminSignup from './pages/admin/AdminSignup';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminCars from './pages/admin/AdminCars';
 import AdminRules from './pages/admin/AdminRules';
+import AdminConversations from './pages/admin/AdminConversations';
+import AdminInsights from './pages/admin/AdminInsights';
 import './App.css';
 
 // Protected Route Component for Admin
@@ -55,6 +57,22 @@ function App() {
             element={
               <AdminProtectedRoute>
                 <AdminRules />
+              </AdminProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/conversations" 
+            element={
+              <AdminProtectedRoute>
+                <AdminConversations />
+              </AdminProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/insights" 
+            element={
+              <AdminProtectedRoute>
+                <AdminInsights />
               </AdminProtectedRoute>
             } 
           />

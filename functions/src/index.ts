@@ -10,6 +10,9 @@ const storage = getStorage();
 
 const client = new vision.ImageAnnotatorClient();
 
+// Export ElevenLabs webhook
+export { searchCars } from "./elevenLabsWebhook.js";
+
 async function updateRuleByStoragePath(storagePath: string, data: Record<string, unknown>) {
   const snap = await db.collection("rules").where("storagePath", "==", storagePath).limit(1).get();
   if (snap.empty) return;

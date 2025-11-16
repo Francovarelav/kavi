@@ -5,7 +5,6 @@ import {
   IconDashboard,
   IconSettings,
   IconMessage2,
-  IconFileAnalytics,
   IconCar,
   IconMessages,
   IconInnerShadowTop,
@@ -43,12 +42,12 @@ export function AdminSidebar({ user, onLogout, ...props }: AdminSidebarProps & R
       },
       {
         title: "Insights",
-        url: "#",
+        url: "/admin/insights",
         icon: IconChartBar,
       },
       {
         title: "Conversaciones",
-        url: "#",
+        url: "/admin/conversations",
         icon: IconMessages,
       },
       {
@@ -60,16 +59,6 @@ export function AdminSidebar({ user, onLogout, ...props }: AdminSidebarProps & R
         title: "Carros",
         url: "/admin/cars",
         icon: IconCar,
-      },
-      {
-        title: "Reportes",
-        url: "#",
-        icon: IconFileAnalytics,
-      },
-      {
-        title: "Chat Interno",
-        url: "#",
-        icon: IconMessages,
       },
     ],
     navSecondary: [

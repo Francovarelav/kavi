@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { AdminSidebar } from "@/components/admin-sidebar";
@@ -6,10 +7,45 @@ import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
 import { IconCar, IconMessages, IconFileAnalytics, IconChartBar } from "@tabler/icons-react";
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../../firebase";
 
 export default function AdminDashboard() {
   const { userData, logout } = useAuth();
   const navigate = useNavigate();
+  const [stats, setStats] = useState({
+    cars: 0,
+    conversations: 0,
+    rules: 0,
+    insights: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    try {
+      const [carsSnap, sessionsSnap, rulesSnap, dataCallsSnap] = await Promise.all([
+        getDocs(collection(db, "cars")),
+        getDocs(collection(db, "sessions")),
+        getDocs(collection(db, "rules")),
+        getDocs(collection(db, "dataCalls")),
+      ]);
+
+      setStats({
+        cars: carsSnap.size,
+        conversations: sessionsSnap.size,
+        rules: rulesSnap.size,
+        insights: dataCallsSnap.size,
+      });
+    } catch (error) {
+      console.error("Error cargando estadísticas:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -20,11 +56,11 @@ export default function AdminDashboard() {
     return null;
   }
 
-  const stats = [
-    { label: "Carros", value: "0", icon: IconCar, color: "text-blue-500" },
-    { label: "Conversaciones", value: "0", icon: IconMessages, color: "text-green-500" },
-    { label: "Reglas Activas", value: "0", icon: IconFileAnalytics, color: "text-purple-500" },
-    { label: "Sugerencias", value: "0", icon: IconChartBar, color: "text-orange-500" },
+  const statsData = [
+    { label: "Carros", value: loading ? "..." : stats.cars.toString(), icon: IconCar, color: "text-blue-500" },
+    { label: "Conversaciones", value: loading ? "..." : stats.conversations.toString(), icon: IconMessages, color: "text-green-500" },
+    { label: "Reglas Activas", value: loading ? "..." : stats.rules.toString(), icon: IconFileAnalytics, color: "text-purple-500" },
+    { label: "Insights", value: loading ? "..." : stats.insights.toString(), icon: IconChartBar, color: "text-orange-500" },
   ];
 
   return (
@@ -54,7 +90,7 @@ export default function AdminDashboard() {
 
           {/* Métricas */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {stats.map((stat) => (
+            {statsData.map((stat) => (
               <Card key={stat.label} className="p-6">
                 <div className="flex items-center justify-between">
                   <div>

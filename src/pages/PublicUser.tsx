@@ -2,28 +2,24 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Spline from "@splinetool/react-spline";
 import { IconSparkles } from "@tabler/icons-react";
+import KaviExperience from "./KaviExperience";
 
 export default function PublicUser() {
   const [started, setStarted] = useState(false);
 
   if (started) {
-    // Aquí iría tu experiencia del agente
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <p className="text-white text-2xl">Experiencia del agente (próximamente)</p>
-      </div>
-    );
+    return <KaviExperience onExit={() => setStarted(false)} />;
   }
 
   return (
     <main className="min-h-screen bg-black flex flex-col overflow-hidden">
       {/* Spline 3D en la parte superior */}
-      <div className="h-[60vh] w-full relative">
+      <div className="h-[60vh] w-full relative pointer-events-none">
         <Spline scene="https://prod.spline.design/DCeeOA3pXfZ3ZrA6/scene.splinecode" />
       </div>
 
       {/* Content abajo con fondo negro */}
-      <div className="flex-1 bg-black flex flex-col items-center justify-center p-6 pb-16">
+      <div className="flex-1 bg-black flex flex-col items-center justify-center p-6 pb-16 relative z-10">
         <div className="w-full max-w-3xl text-center space-y-8">
           {/* Title */}
           <div className="space-y-5 animate-fade-in">
